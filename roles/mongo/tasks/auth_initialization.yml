@@ -1,0 +1,34 @@
+---
+
+- name: 设置authorization
+  set_fact:
+    authorization: false
+
+- name: 配置不需要认证的conf
+  include: authorization.yml
+  tags: [mongodb]
+
+- name: 创建用户
+  mongodb_user:
+    database: admin
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    roles: "{{ item.roles }}"
+    login_port: "{{ MONGO_NET_PORT }}"
+  with_items:
+    - {
+      name: "{{ MONGO_ROOT_USERNAME }}",
+      password: "{{ MONGO_ROOT_PASSWORD }}",
+      roles: "root"
+      }
+
+- name: 设置authorization
+  set_fact:
+    authorization: true
+
+- name: 配置需要认证的conf
+  include: authorization.yml
+  tags: [mongodb]
+
+- name: Flush all handlers at this point
+  meta: flush_handlers

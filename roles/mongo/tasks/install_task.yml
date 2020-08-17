@@ -1,0 +1,21 @@
+---
+- name: Install EPEL release repository
+  package:
+    name: epel-release
+    state: present
+
+- name: Install numactl package
+  yum:
+    name: numactl
+    state: present
+
+- name: Install PIP
+  yum:
+    name:
+      - python-devel
+      - python-pip
+
+- name: Install PyMongo from PIP
+  pip:
+    name: pymongo
+    version: 3.7.1
