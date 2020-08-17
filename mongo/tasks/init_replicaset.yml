@@ -1,0 +1,19 @@
+---
+
+- name: 注册replicaset_host变量
+  set_fact:
+    replicaset_host: []
+
+- name: 循环处理host
+  set_fact:
+    replicaset_host: "{{replicaset_host}} + [ '{{ item }}:{{ MONGO_NET_PORT }}' ]"
+  with_items: "{{ groups['mongo'] }}"
+
+- name: 初始化副本集
+  mongodb_replicaset:
+    login_host: localhost
+    login_port: "{{ MONGO_NET_PORT }}"
+    login_user: "{{ MONGO_ROOT_USERNAME }}"
+    login_password: "{{ MONGO_ROOT_PASSWORD }}"
+    replica_set: mongos
+    members: "{{ replicaset_host }}"
