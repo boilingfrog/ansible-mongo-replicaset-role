@@ -12,6 +12,38 @@
 之后在配置`mongo.conf`为需要认证。重启。  
 4、初始化副本集，设置开机启动。  
 
+
+## 项目结构
+
+````
+.
+├── deploy-mongo.yml
+└── roles
+    └── mongo
+        ├── defaults
+        │   └── main.yml
+        ├── files  
+        │   └── rpms
+        │       ├── mongodb-org-unstable-mongos-4.1.8-1.el7.x86_64.rpm
+        │       ├── mongodb-org-unstable-server-4.1.8-1.el7.x86_64.rpm
+        │       ├── mongodb-org-unstable-shell-4.1.8-1.el7.x86_64.rpm
+        │       └── mongodb-org-unstable-tools-4.1.8-1.el7.x86_64.rpm
+        ├── handlers
+        │   └── main.yml
+        ├── tasks
+        │   ├── auth_initialization.yml
+        │   ├── authorization.yml
+        │   ├── configure.yml
+        │   ├── init_replicaset.yml
+        │   ├── install_task.yml
+        │   └── main.yml
+        └── templates
+            ├── mongodb.service.j2
+            └── mongod.conf.j2
+
+````
+
+
 ## 运行
 
 本地需要安装ansible，之后在ansible中的host配置group
