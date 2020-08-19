@@ -64,3 +64,169 @@ mongo_replicas
 ````
 ansible-playbook deploy-mongo.yml  
 ````
+
+执行
+
+```
+PLAY [mongo] *******************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************************************************************
+ok: [192.168.56.104]
+ok: [192.168.56.105]
+ok: [192.168.56.106]
+
+TASK [mongo : prepare dir] *****************************************************************************************************************************************************
+ok: [192.168.56.104] => (item=/test/mongo)
+ok: [192.168.56.106] => (item=/test/mongo)
+ok: [192.168.56.105] => (item=/test/mongo)
+
+TASK [mongo : 复制 rpm 安装包] ******************************************************************************************************************************************************
+ok: [192.168.56.105] => (item=mongodb-org-unstable-tools-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.104] => (item=mongodb-org-unstable-tools-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.106] => (item=mongodb-org-unstable-tools-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.105] => (item=mongodb-org-unstable-mongos-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.106] => (item=mongodb-org-unstable-mongos-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.104] => (item=mongodb-org-unstable-mongos-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.104] => (item=mongodb-org-unstable-shell-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.105] => (item=mongodb-org-unstable-shell-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.106] => (item=mongodb-org-unstable-shell-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.105] => (item=mongodb-org-unstable-server-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.104] => (item=mongodb-org-unstable-server-4.1.8-1.el7.x86_64.rpm)
+ok: [192.168.56.106] => (item=mongodb-org-unstable-server-4.1.8-1.el7.x86_64.rpm)
+......
+......
+
+TASK [启动 mongo] ****************************************************************************************************************************************************************
+changed: [192.168.56.104]
+changed: [192.168.56.106]
+changed: [192.168.56.105]
+
+PLAY RECAP *********************************************************************************************************************************************************************
+192.168.56.104             : ok=28   changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+192.168.56.105             : ok=25   changed=6    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+192.168.56.106             : ok=25   changed=6    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0  
+```
+
+查看副本集
+````
+mongo -u test -p 123456789
+
+rs.status()
+{
+	"set" : "mongos",
+	"date" : ISODate("2020-08-19T01:06:55.748Z"),
+	"myState" : 1,
+	"term" : NumberLong(2),
+	"syncingTo" : "",
+	"syncSourceHost" : "",
+	"syncSourceId" : -1,
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1597799214, 1),
+			"t" : NumberLong(2)
+		},
+		"readConcernMajorityOpTime" : {
+			"ts" : Timestamp(1597799214, 1),
+			"t" : NumberLong(2)
+		},
+		"appliedOpTime" : {
+			"ts" : Timestamp(1597799214, 1),
+			"t" : NumberLong(2)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1597799214, 1),
+			"t" : NumberLong(2)
+		}
+	},
+	"lastStableRecoveryTimestamp" : Timestamp(1597799170, 1),
+	"lastStableCheckpointTimestamp" : Timestamp(1597799170, 1),
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "192.168.56.104:27017",
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 25,
+			"optime" : {
+				"ts" : Timestamp(1597799214, 1),
+				"t" : NumberLong(2)
+			},
+			"optimeDate" : ISODate("2020-08-19T01:06:54Z"),
+			"syncingTo" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "could not find member to sync from",
+			"electionTime" : Timestamp(1597799202, 1),
+			"electionDate" : ISODate("2020-08-19T01:06:42Z"),
+			"configVersion" : 1,
+			"self" : true,
+			"lastHeartbeatMessage" : ""
+		},
+		{
+			"_id" : 1,
+			"name" : "192.168.56.105:27017",
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 22,
+			"optime" : {
+				"ts" : Timestamp(1597799214, 1),
+				"t" : NumberLong(2)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1597799214, 1),
+				"t" : NumberLong(2)
+			},
+			"optimeDate" : ISODate("2020-08-19T01:06:54Z"),
+			"optimeDurableDate" : ISODate("2020-08-19T01:06:54Z"),
+			"lastHeartbeat" : ISODate("2020-08-19T01:06:54.177Z"),
+			"lastHeartbeatRecv" : ISODate("2020-08-19T01:06:55.147Z"),
+			"pingMs" : NumberLong(1),
+			"lastHeartbeatMessage" : "",
+			"syncingTo" : "192.168.56.104:27017",
+			"syncSourceHost" : "192.168.56.104:27017",
+			"syncSourceId" : 0,
+			"infoMessage" : "",
+			"configVersion" : 1
+		},
+		{
+			"_id" : 2,
+			"name" : "192.168.56.106:27017",
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 22,
+			"optime" : {
+				"ts" : Timestamp(1597799214, 1),
+				"t" : NumberLong(2)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1597799214, 1),
+				"t" : NumberLong(2)
+			},
+			"optimeDate" : ISODate("2020-08-19T01:06:54Z"),
+			"optimeDurableDate" : ISODate("2020-08-19T01:06:54Z"),
+			"lastHeartbeat" : ISODate("2020-08-19T01:06:54.177Z"),
+			"lastHeartbeatRecv" : ISODate("2020-08-19T01:06:54.993Z"),
+			"pingMs" : NumberLong(0),
+			"lastHeartbeatMessage" : "",
+			"syncingTo" : "192.168.56.104:27017",
+			"syncSourceHost" : "192.168.56.104:27017",
+			"syncSourceId" : 0,
+			"infoMessage" : "",
+			"configVersion" : 1
+		}
+	],
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1597799214, 1),
+		"signature" : {
+			"hash" : BinData(0,"DOXez6PTTqpY34sHPHuxKeT2iIE="),
+			"keyId" : NumberLong("6862494794178887682")
+		}
+	},
+	"operationTime" : Timestamp(1597799214, 1)
+}
+````
