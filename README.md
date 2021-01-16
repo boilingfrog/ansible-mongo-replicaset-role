@@ -230,3 +230,13 @@ rs.status()
 	"operationTime" : Timestamp(1597799214, 1)
 }
 ````
+
+## 异常报错
+
+```
+FAILED! => {"changed": false, "msg": "Unable to authenticate with MongoDB: check_compatibility() takes exactly 2 arguments (3 given)"}
+```
+
+升级ansible依赖的python版本  
+
+报错版本`python2.7`,更换版本`2.7.10`，解决上面报错  
