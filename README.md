@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [ansible-mongo-replicaset-role](#ansible-mongo-replicaset-role)
+  - [前言](#%E5%89%8D%E8%A8%80)
+  - [安装思路](#%E5%AE%89%E8%A3%85%E6%80%9D%E8%B7%AF)
+  - [项目结构](#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84)
+  - [运行](#%E8%BF%90%E8%A1%8C)
+    - [1、使用本机安装的 ansible](#1%E4%BD%BF%E7%94%A8%E6%9C%AC%E6%9C%BA%E5%AE%89%E8%A3%85%E7%9A%84-ansible)
+      - [异常报错](#%E5%BC%82%E5%B8%B8%E6%8A%A5%E9%94%99)
+    - [2、使用 docker 安装](#2%E4%BD%BF%E7%94%A8-docker-%E5%AE%89%E8%A3%85)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # ansible-mongo-replicaset-role
 
 ## 前言
@@ -15,34 +29,35 @@
 ## 项目结构
 
 ````
-.
-├── deploy-mongo.yml
-└── roles
-    └── mongo
-        ├── defaults  // 一些配置信息
-        │   └── main.yml
-        ├── files  // mongo的安装包
-        │   └── rpms
-        │       ├── mongodb-org-unstable-mongos-4.1.8-1.el7.x86_64.rpm
-        │       ├── mongodb-org-unstable-server-4.1.8-1.el7.x86_64.rpm
-        │       ├── mongodb-org-unstable-shell-4.1.8-1.el7.x86_64.rpm
-        │       └── mongodb-org-unstable-tools-4.1.8-1.el7.x86_64.rpm
-        ├── handlers // notify重启服务的task
-        │   └── main.yml
-        ├── tasks
-        │   ├── auth_initialization.yml
-        │   ├── authorization.yml
-        │   ├── configure.yml
-        │   ├── init_replicaset.yml
-        │   ├── install_task.yml
-        │   └── main.yml
-        └── templates
-            ├── mongodb.service.j2
-            └── mongod.conf.j2
-
+├── playbooks
+│   ├── deploy-mongo.yml
+│   └── roles
+│       └── mongo
+│           ├── defaults
+│           │   └── main.yml
+│           ├── files
+│           │   └── rpms
+│           │       ├── mongodb-org-unstable-mongos-4.1.8-1.el7.x86_64.rpm
+│           │       ├── mongodb-org-unstable-server-4.1.8-1.el7.x86_64.rpm
+│           │       ├── mongodb-org-unstable-shell-4.1.8-1.el7.x86_64.rpm
+│           │       └── mongodb-org-unstable-tools-4.1.8-1.el7.x86_64.rpm
+│           ├── handlers
+│           │   └── main.yml
+│           ├── tasks
+│           │   ├── auth_initialization.yml
+│           │   ├── authorization.yml
+│           │   ├── configure.yml
+│           │   ├── init_replicaset.yml
+│           │   ├── install_task.yml
+│           │   └── main.yml
+│           └── templates
+│               ├── mongod.conf.j2
+│               └── mongodb.service.j2
 ````
 
-## 运行
+## 运行  
+
+### 1、使用本机安装的 ansible 
 
 本地需要安装`ansible`，之后在`ansible`中的host配置`group`,`ansible`的版本需要在`2.8`之上。  
 
@@ -62,7 +77,7 @@ mongo_replicas
 运行  
 
 ````
-ansible-playbook deploy-mongo.yml  
+ansible-playbook ./playbooks/deploy-mongo.yml  
 ````
 
 执行
@@ -231,7 +246,7 @@ rs.status()
 }
 ````
 
-## 异常报错
+#### 异常报错
 
 ```
 FAILED! => {"changed": false, "msg": "Unable to authenticate with MongoDB: check_compatibility() takes exactly 2 arguments (3 given)"}
@@ -240,3 +255,15 @@ FAILED! => {"changed": false, "msg": "Unable to authenticate with MongoDB: check
 升级ansible依赖的python版本  
 
 报错版本`python2.7`,更换版本`2.7.10`，解决上面报错  
+
+### 2、使用 docker 安装
+
+优点，本机只需要安装 docker 即可，统一的 ansible 版本和 python 版本，避免版本不一致造成的安装问题。
+
+1、在 `./targets/dev/.ssh` 放入自己的私钥； 
+
+2、在 `./targets/dev/.host` 配置自己的服务器信息；  
+
+3、执行 `./run jumper dev` 进入到 ansible 脚本的镜像中；  
+
+4、执行对应的 playbooks 脚本，`bash-5.0# ansible-playbook ./playbooks/deploy-mongo.yml `。  
