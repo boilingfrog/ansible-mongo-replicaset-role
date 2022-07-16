@@ -1,0 +1,71 @@
+#!/bin/bash
+set -e
+set -o pipefail
+
+DP_ROOT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
+cd ${DP_ROOT_DIR}
+
+. ./env.sh
+
+version=${DEPLOY_VERSION:-latest}
+registry=${REGISTRY_SERVER:-liz2019}
+context=${DP_ROOT_DIR}
+
+GOVERSION=1.9.2
+
+go_docker_run() {
+    docker_run -e GO_LDFLAGS="${GO_LDFLAGS}" -w /go -v `pwd`:/go golang:${GOVERSION} "${@}"
+}
+
+watch_run() {
+    teapot "$@"
+}
+
+
+function jumper(){
+    hostname=${HOSTNAME}
+    target=${1}
+    subtarget=${2}
+
+    hosts=targets/${target}/.hosts
+    [[ ! -f ${hosts} ]] && echo "${hosts} not found" && exit 1
+    if [[ $subtarget != "" ]]; then
+        subhosts=targets/${target}/.hosts.${subtarget}
+        [[ ! -f ${subhosts} ]] && echfo "${subhosts} not found" && exit 1
+        hosts+=,${subhosts}
+    fi
+
+    [[ -f .env.jumper ]] && args+="--env-file .env.jumper "
+    [[ -f .env.jumper.${target} ]] && args+="--env-file .env.jumper.${target} "
+    [[ -f bin/.versions ]] && args+="--env-file bin/.versions "
+
+    # create history file
+    touch `pwd`/targets/${target}/.bash_history
+
+    docker rm -vf jumper.${target} >/dev/null 2>&1 || true
+    docker run -ti --rm --net=host \
+        --name jumper.${target} \
+        --privileged \
+        -w /root/deploy \
+        -h ${hostname} \
+        -e ANSIBLE_INVENTORY=${hosts} \
+        -e TARGET=${target} \
+        -w /root/deploy \
+        -v `pwd`:/root/deploy \
+        -v `pwd`/targets/${target}/.bash_history:/root/.bash_history \
+        -v `pwd`/targets/${target}/.ssh:/root/.ssh \
+        -v `pwd`/targets/${target}/.mongo-deploy:/etc/mongo-deploy \
+        -v `pwd`/targets/${target}/.cache/facts_cache:/var/cache/facts_cache \
+        ${args}${registry}/tools-alpine:0.5 bash
+}
+
+
+
+case "${1}" in
+    jumper)
+        jumper ${@:2}
+        ;;
+    *)
+        echo "no command ${1}"
+        ;;
+esac
