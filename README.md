@@ -33,15 +33,15 @@
 │   ├── deploy-mongo.yml
 │   └── roles
 │       └── mongo
-│           ├── defaults
+│           ├── defaults // 一些配置信息
 │           │   └── main.yml
-│           ├── files
+│           ├── files // mongo的安装包
 │           │   └── rpms
 │           │       ├── mongodb-org-unstable-mongos-4.1.8-1.el7.x86_64.rpm
 │           │       ├── mongodb-org-unstable-server-4.1.8-1.el7.x86_64.rpm
 │           │       ├── mongodb-org-unstable-shell-4.1.8-1.el7.x86_64.rpm
 │           │       └── mongodb-org-unstable-tools-4.1.8-1.el7.x86_64.rpm
-│           ├── handlers
+│           ├── handlers // notify重启服务的task
 │           │   └── main.yml
 │           ├── tasks
 │           │   ├── auth_initialization.yml
