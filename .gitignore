@@ -1,1 +1,5 @@
 /targets/dev/.ssh/
+/.idea/.gitignore
+/.idea/ansible-mongo-replicaset-role.iml
+/.idea/modules.xml
+/.idea/vcs.xml
