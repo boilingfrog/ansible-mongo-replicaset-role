@@ -267,3 +267,5 @@ FAILED! => {"changed": false, "msg": "Unable to authenticate with MongoDB: check
 3、执行 `./run jumper dev` 进入到 ansible 脚本的镜像中；  
 
 4、执行对应的 playbooks 脚本，`bash-5.0# ansible-playbook ./playbooks/deploy-mongo.yml `。  
+
+<img src="/img/ansible-deploy.jpg"  alt="asnible" />    
